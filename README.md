@@ -45,10 +45,12 @@ Ready-to-use policies in `deploy/robots/`:
 
 ### G1-23dof
 
-| Policy | Type | Description |
-|--------|------|-------------|
-| **Velocity** | Locomotion | Walking |
-| **Bata Dias** | Mimic | Rokoko motion capture |
+| Policy | Type | Description | Gamepad |
+|--------|------|-------------|---------|
+| **Velocity** | Locomotion | Walking with velocity control | `RB + X` |
+| **Gangnam Style** | Mimic | Dance motion | `LT + ←` |
+| **Dance 102** | Mimic | Dance motion | `LT + ↓` |
+| **Bata Dias** | Mimic | Rokoko motion capture | `LT + A` |
 
 ---
 
@@ -94,21 +96,38 @@ git clone https://github.com/unitreerobotics/unitree_sdk2
 cd unitree_sdk2 && mkdir build && cd build
 cmake .. && sudo make install
 
-# Build g1_ctrl
+# Build g1_ctrl (G1-29dof)
 cd unitree_rl_lab/deploy/robots/g1_29dof
+mkdir build && cd build
+cmake .. && make
+
+# Build g1_ctrl (G1-23dof)
+cd unitree_rl_lab/deploy/robots/g1_23dof
 mkdir build && cd build
 cmake .. && make
 ```
 
 ### Run in MuJoCo (Simulation)
 
+**G1-29dof:**
 ```bash
 # Terminal 1: MuJoCo
 cd unitree_mujoco/simulate/build
-./unitree_mujoco
+./unitree_mujoco -r g1 -s scene_29dof.xml -i 1 -n lo
 
 # Terminal 2: Controller
 cd unitree_rl_lab/deploy/robots/g1_29dof/build
+./g1_ctrl --network lo
+```
+
+**G1-23dof:**
+```bash
+# Terminal 1: MuJoCo
+cd unitree_mujoco/simulate/build
+./unitree_mujoco -r g1 -s scene_23dof.xml -i 1 -n lo
+
+# Terminal 2: Controller
+cd unitree_rl_lab/deploy/robots/g1_23dof/build
 ./g1_ctrl --network lo
 ```
 
@@ -157,6 +176,8 @@ cd unitree_rl_lab/deploy/robots/g1_29dof/build
 | `Unitree-G1-29dof-Mimic-Dance-102` | G1-29dof | Dance 102 |
 | `Unitree-G1-29dof-Mimic-My-Dance` | G1-29dof | Custom |
 | `Unitree-G1-29dof-Mimic-Bata-Dias` | G1-29dof | Rokoko |
+| `Unitree-G1-23dof-Mimic-Gangnam-Style` | G1-23dof | Gangnam Style |
+| `Unitree-G1-23dof-Mimic-Dance-102` | G1-23dof | Dance 102 |
 | `Unitree-G1-23dof-Mimic-Bata-Dias` | G1-23dof | Rokoko |
 
 ---
@@ -211,7 +232,15 @@ unitree_rl_lab/
 │   │               ├── my_dance/
 │   │               └── bata_dias/
 │   └── g1_23dof/
-│       └── config/policy/
+│       ├── build/g1_ctrl          # Compiled controller
+│       └── config/
+│           ├── config.yaml        # FSM + gamepad mapping
+│           └── policy/
+│               ├── velocity/      # Walking policy
+│               └── mimic/         # Dance policies
+│                   ├── gangnam_style/
+│                   ├── dance_102/
+│                   └── bata_dias/
 ├── source/.../tasks/
 │   ├── locomotion/               # Walking tasks
 │   └── mimic/                    # Dance tasks

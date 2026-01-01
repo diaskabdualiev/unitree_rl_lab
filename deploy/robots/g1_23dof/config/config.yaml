@@ -10,6 +10,12 @@ FSM:
     Mimic_Bata_Dias:
       id: 104
       type: Mimic
+    Mimic_Gangnam_Style:
+      id: 105
+      type: Mimic
+    Mimic_Dance_102:
+      id: 106
+      type: Mimic
 
   Passive:
     transitions:
@@ -34,6 +40,8 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
       Mimic_Bata_Dias: LT + A.on_pressed
+      Mimic_Gangnam_Style: LT + left.on_pressed
+      Mimic_Dance_102: LT + down.on_pressed
     kp: [
       100., 100., 100., 150., 40., 40.,  # left leg
       100., 100., 100., 150., 40., 40.,  # right leg
@@ -72,4 +80,22 @@ FSM:
     policy_dir: config/policy/mimic/bata_dias
     time_start: 0.0
     time_end: 12.5
+  Mimic_Gangnam_Style:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/gangnam_style/params/gangnam_style_23dof_60hz.csv
+    policy_dir: config/policy/mimic/gangnam_style
+    time_start: 0.0
+    time_end: 25.0
+  Mimic_Dance_102:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/dance_102/params/dance_102_23dof_60hz.csv
+    policy_dir: config/policy/mimic/dance_102
+    time_start: 0.0
+    time_end: 20.0
 
