@@ -14,9 +14,15 @@ FSM:
     Mimic_Gangnam_Style:
       id: 102
       type: Mimic
+    Mimic_My_Dance:
+      id: 103
+      type: Mimic
+    Mimic_Bata_Dias:
+      id: 104
+      type: Mimic
 
   Passive:
-    transitions: 
+    transitions:
       FixStand: LT + up.on_pressed
     mode: [
       1,1,1,1,1,1,
@@ -33,9 +39,13 @@ FSM:
       3,3,3,3,3,3,3,  
     ]
   FixStand:
-    transitions: 
+    transitions:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
+      Mimic_Dance_102: LT + down.on_pressed
+      Mimic_Gangnam_Style: LT + left.on_pressed
+      Mimic_My_Dance: LT + right.on_pressed
+      Mimic_Bata_Dias: LT + A.on_pressed
     kp: [
       100., 100., 100., 150., 40., 40.,
       100., 100., 100., 150., 40., 40.,
@@ -61,10 +71,12 @@ FSM:
       ]
     ]
   Velocity:
-    transitions: 
+    transitions:
       Passive: LT + B.on_pressed
       Mimic_Dance_102: LT(2s) + down.on_pressed
       Mimic_Gangnam_Style: LT(2s) + left.on_pressed
+      Mimic_My_Dance: LT(2s) + right.on_pressed
+      Mimic_Bata_Dias: LT(2s) + A.on_pressed
 
     policy_dir: config/policy/velocity
     # policy_dir: ../../../logs/rsl_rl/unitree_g1_29dof_velocity
@@ -78,7 +90,7 @@ FSM:
     time_start: 2.8
     time_end: 24.0
   Mimic_Gangnam_Style:
-    transitions: 
+    transitions:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 60
@@ -86,4 +98,22 @@ FSM:
     policy_dir: config/policy/mimic/gangnam_style/
     time_start: 5.2
     time_end: 25.5
+  Mimic_My_Dance:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/my_dance/params/my_dance_60hz.csv
+    policy_dir: config/policy/mimic/my_dance/
+    time_start: 0.0
+    time_end: 10.0
+  Mimic_Bata_Dias:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/bata_dias/params/bata_dias_full_60hz.csv
+    policy_dir: config/policy/mimic/bata_dias/
+    time_start: 0.0
+    time_end: 12.5
 

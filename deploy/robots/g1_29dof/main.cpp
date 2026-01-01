@@ -34,7 +34,9 @@ int main(int argc, char** argv)
     std::cout << "     G1-29dof Controller \n";
 
     // Unitree DDS Config
-    unitree::robot::ChannelFactory::Instance()->Init(0, vm["network"].as<std::string>());
+    // Use domain_id=1 for simulation, domain_id=0 for real robot
+    int domain_id = 1;  // Change to 0 for real robot
+    unitree::robot::ChannelFactory::Instance()->Init(domain_id, vm["network"].as<std::string>());
 
     init_fsm_state();
 

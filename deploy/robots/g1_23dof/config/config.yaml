@@ -7,52 +7,69 @@ FSM:
     Velocity:
       id: 3
       type: RLBase
+    Mimic_Bata_Dias:
+      id: 104
+      type: Mimic
+
   Passive:
-    transitions: 
+    transitions:
       FixStand: LT + up.on_pressed
+    # 23 joints: legs(12) + waist(1) + arms(10)
     mode: [
-      1,1,1,1,1,1,
-      1,1,1,1,1,1,
-      1,1,1,
-      1,1,1,1,1,1,1,
-      1,1,1,1,1,1,1,
+      1,1,1,1,1,1,  # left leg (6)
+      1,1,1,1,1,1,  # right leg (6)
+      1,             # waist_yaw (1)
+      1,1,1,1,1,    # left arm (5): shoulder_pitch/roll/yaw, elbow, wrist_roll
+      1,1,1,1,1,    # right arm (5): shoulder_pitch/roll/yaw, elbow, wrist_roll
     ]
     kd: [
-      3,3,3,3,3,3,
-      3,3,3,3,3,3,
-      3,3,3,
-      3,3,3,3,3,3,3,  
-      3,3,3,3,3,3,3,  
+      3,3,3,3,3,3,  # left leg
+      3,3,3,3,3,3,  # right leg
+      3,             # waist_yaw
+      3,3,3,3,3,    # left arm
+      3,3,3,3,3,    # right arm
     ]
   FixStand:
-    transitions: 
+    transitions:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
+      Mimic_Bata_Dias: LT + A.on_pressed
     kp: [
-      100., 100., 100., 150., 40., 40.,
-      100., 100., 100., 150., 40., 40.,
-      200,200,200,
-      40,40,40,40,40,40,40,
-      40,40,40,40,40,40,40,
+      100., 100., 100., 150., 40., 40.,  # left leg
+      100., 100., 100., 150., 40., 40.,  # right leg
+      200,                                # waist_yaw
+      40,40,40,40,40,                     # left arm
+      40,40,40,40,40,                     # right arm
     ]
     kd: [
-      2,2,2,4,2,2,
-      2,2,2,4,2,2,
-      5,5,5,
-      10,10,10,10,10,10,10,
-      10,10,10,10,10,10,10,
+      2,2,2,4,2,2,  # left leg
+      2,2,2,4,2,2,  # right leg
+      5,             # waist_yaw
+      10,10,10,10,10, # left arm
+      10,10,10,10,10, # right arm
     ]
     ts: [0, 3]
     qs: [
       [],
-      [ -0.1, 0,0,0.3,-0.2,0,
-        -0.1, 0,0,0.3,-0.2,0,
-        0,0,0,
-        0, 0.25,0,0.97,0.15, 0,0,
-        0, -0.25,0,0.97,-0.15, 0,0
+      [ -0.1, 0,0,0.3,-0.2,0,              # left leg
+        -0.1, 0,0,0.3,-0.2,0,              # right leg
+        0,                                  # waist_yaw
+        0, 0.25, 0, 0.97, 0,               # left arm (no wrist_pitch/yaw)
+        0, -0.25, 0, 0.97, 0               # right arm (no wrist_pitch/yaw)
       ]
     ]
   Velocity:
-    transitions: 
+    transitions:
       Passive: LT + B.on_pressed
-    policy_dir: ../../../logs/rsl_rl/unitree_g1_23dof_velocity
+      Mimic_Bata_Dias: LT(2s) + A.on_pressed
+    policy_dir: config/policy/velocity
+  Mimic_Bata_Dias:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/bata_dias/params/bata_dias_23dof_60hz.csv
+    policy_dir: config/policy/mimic/bata_dias
+    time_start: 0.0
+    time_end: 12.5
+

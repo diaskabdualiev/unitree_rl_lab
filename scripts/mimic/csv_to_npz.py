@@ -2,8 +2,11 @@
 
 .. code-block:: bash
 
-    # Usage
+    # Usage for G1-29dof (default):
     python csv_to_npz.py -f path_to_input.csv --input_fps 60
+
+    # Usage for G1-23dof:
+    python csv_to_npz.py -f path_to_input.csv --input_fps 60 --robot g1_23dof
 """
 
 """Launch Isaac Sim Simulator first."""
@@ -29,6 +32,13 @@ parser.add_argument(
 )
 parser.add_argument("--output_name", type=str, help="The name of the motion npz file.")
 parser.add_argument("--output_fps", type=int, default=50, help="The fps of the output motion.")
+parser.add_argument(
+    "--robot",
+    type=str,
+    default="g1_29dof",
+    choices=["g1_29dof", "g1_23dof"],
+    help="Robot type: g1_29dof (default) or g1_23dof",
+)
 
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -60,27 +70,44 @@ from isaaclab.utils.math import axis_angle_from_quat, quat_conjugate, quat_mul, 
 ##
 # Pre-defined configs
 ##
-from unitree_rl_lab.assets.robots.unitree import UNITREE_G1_29DOF_CFG as ROBOT_CFG  # Currently only support G1-29dof
+from unitree_rl_lab.assets.robots.unitree import (
+    UNITREE_G1_29DOF_MIMIC_CFG,
+    UNITREE_G1_23DOF_MIMIC_CFG,
+)
+
+# Robot config mapping
+# Using MIMIC_CFG versions because they have proper joint_sdk_names for motion capture
+ROBOT_CONFIGS = {
+    "g1_29dof": UNITREE_G1_29DOF_MIMIC_CFG,
+    "g1_23dof": UNITREE_G1_23DOF_MIMIC_CFG,
+}
 
 
-@configclass
-class ReplayMotionsSceneCfg(InteractiveSceneCfg):
-    """Configuration for a replay motions scene."""
+def create_scene_cfg(robot_type: str) -> type:
+    """Create scene configuration for the specified robot type."""
+    robot_cfg = ROBOT_CONFIGS[robot_type]
+    print(f"[INFO]: Using {robot_type.upper()} robot configuration")
 
-    # ground plane
-    ground = AssetBaseCfg(prim_path="/World/defaultGroundPlane", spawn=sim_utils.GroundPlaneCfg())
+    @configclass
+    class ReplayMotionsSceneCfg(InteractiveSceneCfg):
+        """Configuration for a replay motions scene."""
 
-    # lights
-    sky_light = AssetBaseCfg(
-        prim_path="/World/skyLight",
-        spawn=sim_utils.DomeLightCfg(
-            intensity=750.0,
-            texture_file=f"{ISAAC_NUCLEUS_DIR}/Materials/Textures/Skies/PolyHaven/kloofendal_43d_clear_puresky_4k.hdr",
-        ),
-    )
+        # ground plane
+        ground = AssetBaseCfg(prim_path="/World/defaultGroundPlane", spawn=sim_utils.GroundPlaneCfg())
 
-    # articulation
-    robot: ArticulationCfg = ROBOT_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        # lights
+        sky_light = AssetBaseCfg(
+            prim_path="/World/skyLight",
+            spawn=sim_utils.DomeLightCfg(
+                intensity=750.0,
+                texture_file=f"{ISAAC_NUCLEUS_DIR}/Materials/Textures/Skies/PolyHaven/kloofendal_43d_clear_puresky_4k.hdr",
+            ),
+        )
+
+        # articulation
+        robot: ArticulationCfg = robot_cfg.replace(prim_path="{ENV_REGEX_NS}/Robot")
+
+    return ReplayMotionsSceneCfg
 
 
 class MotionLoader:
@@ -313,8 +340,9 @@ def main():
     sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
     sim_cfg.dt = 1.0 / args_cli.output_fps
     sim = SimulationContext(sim_cfg)
-    # Design scene
-    scene_cfg = ReplayMotionsSceneCfg(num_envs=1, env_spacing=2.0)
+    # Design scene with the appropriate robot type
+    SceneCfg = create_scene_cfg(args_cli.robot)
+    scene_cfg = SceneCfg(num_envs=1, env_spacing=2.0)
     scene = InteractiveScene(scene_cfg)
     # Play the simulator
     sim.reset()
