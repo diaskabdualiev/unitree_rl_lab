@@ -3,148 +3,253 @@
 [![IsaacSim](https://img.shields.io/badge/IsaacSim-5.1.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
 [![Isaac Lab](https://img.shields.io/badge/IsaacLab-2.3.0-silver)](https://isaac-sim.github.io/IsaacLab)
 [![License](https://img.shields.io/badge/license-Apache2.0-yellow.svg)](https://opensource.org/license/apache-2-0)
-[![Discord](https://img.shields.io/badge/-Discord-5865F2?style=flat&logo=Discord&logoColor=white)](https://discord.gg/ZwcVwxv5rq)
 
+Reinforcement learning environments for Unitree robots, built on [IsaacLab](https://github.com/isaac-sim/IsaacLab).
 
-## Overview
-
-This project provides a set of reinforcement learning environments for Unitree robots, built on top of [IsaacLab](https://github.com/isaac-sim/IsaacLab).
-
-Currently supports Unitree **Go2**, **H1** and **G1-29dof** robots.
+> **Fork** of [unitreerobotics/unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab) with custom policies and motion capture pipelines.
 
 <div align="center">
 
-| <div align="center"> Isaac Lab </div> | <div align="center">  Mujoco </div> |  <div align="center"> Physical </div> |
-|--- | --- | --- |
+| Isaac Lab | MuJoCo | Physical |
+|---|---|---|
 | [<img src="https://oss-global-cdn.unitree.com/static/d879adac250648c587d3681e90658b49_480x397.gif" width="240px">](g1_sim.gif) | [<img src="https://oss-global-cdn.unitree.com/static/3c88e045ab124c3ab9c761a99cb5e71f_480x397.gif" width="240px">](g1_mujoco.gif) | [<img src="https://oss-global-cdn.unitree.com/static/6c17c6cf52ec4e26bbfab1fbf591adb2_480x270.gif" width="240px">](g1_real.gif) |
 
 </div>
 
-## Installation
+---
 
-- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html).
-- Install the Unitree RL IsaacLab standalone environments.
+## Supported Robots
 
-  - Clone or copy this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
+| Robot | Locomotion | Mimic (Dance) |
+|-------|------------|---------------|
+| **G1-29dof** | ✅ | ✅ |
+| **G1-23dof** | ✅ | ✅ |
+| **Go2** | ✅ | ❌ |
+| **H1** | ✅ | ❌ |
 
-    ```bash
-    git clone https://github.com/unitreerobotics/unitree_rl_lab.git
-    ```
-  - Use a python interpreter that has Isaac Lab installed, install the library in editable mode using:
+---
 
-    ```bash
-    conda activate env_isaaclab
-    ./unitree_rl_lab.sh -i
-    # restart your shell to activate the environment changes.
-    ```
-- Download unitree robot description files
+## Pre-trained Policies
 
-  *Method 1: Using USD Files*
-  - Download unitree usd files from [unitree_model](https://huggingface.co/datasets/unitreerobotics/unitree_model/tree/main), keeping folder structure
-    ```bash
-    git clone https://huggingface.co/datasets/unitreerobotics/unitree_model
-    ```
-  - Config `UNITREE_MODEL_DIR` in `source/unitree_rl_lab/unitree_rl_lab/assets/robots/unitree.py`.
+Ready-to-use policies in `deploy/robots/`:
 
-    ```bash
-    UNITREE_MODEL_DIR = "</home/user/projects/unitree_usd>"
-    ```
+### G1-29dof
 
-  *Method 2: Using URDF Files [Recommended]* Only for Isaacsim >= 5.0
-  -  Download unitree robot urdf files from [unitree_ros](https://github.com/unitreerobotics/unitree_ros)
-      ```
-      git clone https://github.com/unitreerobotics/unitree_ros.git
-      ```
-  - Config `UNITREE_ROS_DIR` in `source/unitree_rl_lab/unitree_rl_lab/assets/robots/unitree.py`.
-    ```bash
-    UNITREE_ROS_DIR = "</home/user/projects/unitree_ros/unitree_ros>"
-    ```
-  - [Optional]: change *robot_cfg.spawn* if you want to use urdf files
+| Policy | Type | Description | Gamepad |
+|--------|------|-------------|---------|
+| **Velocity** | Locomotion | Walking with velocity control | `RB + X` |
+| **Gangnam Style** | Mimic | Dance motion | `LT + ←` |
+| **Dance 102** | Mimic | Dance motion | `LT + ↓` |
+| **My Dance** | Mimic | Custom dance | `LT + →` |
+| **Bata Dias** | Mimic | Rokoko motion capture | `LT + A` |
 
+### G1-23dof
 
+| Policy | Type | Description |
+|--------|------|-------------|
+| **Velocity** | Locomotion | Walking |
+| **Bata Dias** | Mimic | Rokoko motion capture |
 
-- Verify that the environments are correctly installed by:
+---
 
-  - Listing the available tasks:
+## Quick Start
 
-    ```bash
-    ./unitree_rl_lab.sh -l # This is a faster version than isaaclab
-    ```
-  - Running a task:
-
-    ```bash
-    ./unitree_rl_lab.sh -t --task Unitree-G1-29dof-Velocity # support for autocomplete task-name
-    # same as
-    python scripts/rsl_rl/train.py --headless --task Unitree-G1-29dof-Velocity
-    ```
-  - Inference with a trained agent:
-
-    ```bash
-    ./unitree_rl_lab.sh -p --task Unitree-G1-29dof-Velocity # support for autocomplete task-name
-    # same as
-    python scripts/rsl_rl/play.py --task Unitree-G1-29dof-Velocity
-    ```
-
-## Deploy
-
-After the model training is completed, we need to perform sim2sim on the trained strategy in Mujoco to test the performance of the model.
-Then deploy sim2real.
-
-### Setup
+### Installation
 
 ```bash
-# Install dependencies
-sudo apt install -y libyaml-cpp-dev libboost-all-dev libeigen3-dev libspdlog-dev libfmt-dev
+# Clone
+git clone https://github.com/diaskabdualiev/unitree_rl_lab.git
+cd unitree_rl_lab
+
+# Install (requires Isaac Lab)
+conda activate env_isaaclab
+./unitree_rl_lab.sh -i
+```
+
+### Training
+
+```bash
+# Locomotion (walking)
+./unitree_rl_lab.sh -t --task Unitree-G1-29dof-Velocity --headless
+
+# Mimic (dance)
+./unitree_rl_lab.sh -t --task Unitree-G1-29dof-Mimic-Bata-Dias --headless
+```
+
+### Inference
+
+```bash
+./unitree_rl_lab.sh -p --task Unitree-G1-29dof-Velocity
+```
+
+---
+
+## Deploy to Real Robot / MuJoCo
+
+### Build Controller
+
+```bash
 # Install unitree_sdk2
-git clone git@github.com:unitreerobotics/unitree_sdk2.git
-cd unitree_sdk2
-mkdir build && cd build
-cmake .. -DBUILD_EXAMPLES=OFF # Install on the /usr/local directory
-sudo make install
-# Compile the robot_controller
-cd unitree_rl_lab/deploy/robots/g1_29dof # or other robots
+git clone https://github.com/unitreerobotics/unitree_sdk2
+cd unitree_sdk2 && mkdir build && cd build
+cmake .. && sudo make install
+
+# Build g1_ctrl
+cd unitree_rl_lab/deploy/robots/g1_29dof
 mkdir build && cd build
 cmake .. && make
 ```
 
-### Sim2Sim
-
-Installing the [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco?tab=readme-ov-file#installation).
-
-- Set the `robot` at `/simulate/config.yaml` to g1
-- Set `domain_id` to 0
-- Set `enable_elastic_hand` to 1
-- Set `use_joystck` to 1.
+### Run in MuJoCo (Simulation)
 
 ```bash
-# start simulation
+# Terminal 1: MuJoCo
 cd unitree_mujoco/simulate/build
 ./unitree_mujoco
-# ./unitree_mujoco -i 0 -n eth0 -r g1 -s scene_29dof.xml # alternative
-```
 
-```bash
+# Terminal 2: Controller
 cd unitree_rl_lab/deploy/robots/g1_29dof/build
-./g1_ctrl
-# 1. press [L2 + Up] to set the robot to stand up
-# 2. Click the mujoco window, and then press 8 to make the robot feet touch the ground.
-# 3. Press [R1 + X] to run the policy.
-# 4. Click the mujoco window, and then press 9 to disable the elastic band.
+./g1_ctrl --network lo
 ```
 
-### Sim2Real
-
-You can use this program to control the robot directly, but make sure the on-borad control program has been closed.
+### Run on Real Robot
 
 ```bash
-./g1_ctrl --network eth0 # eth0 is the network interface name.
+./g1_ctrl --network eth0
 ```
+
+### Gamepad Controls
+
+| Combo | Action |
+|-------|--------|
+| `LT + ↑` | Stand up (FixStand) |
+| `RB + X` | Walk (Velocity) |
+| `LT + ↓` | Dance 102 |
+| `LT + ←` | Gangnam Style |
+| `LT + →` | My Dance |
+| `LT + A` | Bata Dias |
+| `LT + B` | Stop (Passive) |
+| Left Stick | Move |
+| Right Stick | Rotate |
+
+---
+
+## Available Tasks
+
+```bash
+./unitree_rl_lab.sh -l
+```
+
+### Locomotion
+
+| Task ID | Robot |
+|---------|-------|
+| `Unitree-G1-29dof-Velocity` | G1 (29 joints) |
+| `Unitree-G1-23dof-Velocity` | G1 (23 joints) |
+| `Unitree-Go2-Velocity` | Go2 |
+| `Unitree-H1-Velocity` | H1 |
+
+### Mimic (Dance)
+
+| Task ID | Robot | Motion |
+|---------|-------|--------|
+| `Unitree-G1-29dof-Mimic-Gangnanm-Style` | G1-29dof | Gangnam Style |
+| `Unitree-G1-29dof-Mimic-Dance-102` | G1-29dof | Dance 102 |
+| `Unitree-G1-29dof-Mimic-My-Dance` | G1-29dof | Custom |
+| `Unitree-G1-29dof-Mimic-Bata-Dias` | G1-29dof | Rokoko |
+| `Unitree-G1-23dof-Mimic-Bata-Dias` | G1-23dof | Rokoko |
+
+---
+
+## Motion Capture Pipeline
+
+Create custom dance motions from Rokoko or video:
+
+| Guide | Description |
+|-------|-------------|
+| [ROKOKO_PIPELINE.md](./ROKOKO_PIPELINE.md) | Rokoko FBX → CSV → Training |
+| [MOTION_CAPTURE_PIPELINE.md](./MOTION_CAPTURE_PIPELINE.md) | Video → SMPL → Robot |
+| [G1_23DOF_GUIDE.md](./G1_23DOF_GUIDE.md) | G1-23dof specific guide |
+| [4D_HUMANS_GUIDE.md](./4D_HUMANS_GUIDE.md) | 4D-Humans pose extraction |
+
+### Pipeline
+
+```
+Rokoko / Video
+      ↓
+   FBX / MP4
+      ↓
+  SMPL / BVH
+      ↓
+ CSV (60 Hz)
+      ↓
+    NPZ
+      ↓
+  Training
+      ↓
+ policy.onnx
+      ↓
+ Real Robot
+```
+
+---
+
+## Project Structure
+
+```
+unitree_rl_lab/
+├── deploy/robots/
+│   ├── g1_29dof/
+│   │   ├── build/g1_ctrl          # Compiled controller
+│   │   └── config/
+│   │       ├── config.yaml        # FSM + gamepad mapping
+│   │       └── policy/
+│   │           ├── velocity/      # Walking policy
+│   │           └── mimic/         # Dance policies
+│   │               ├── gangnam_style/
+│   │               ├── dance_102/
+│   │               ├── my_dance/
+│   │               └── bata_dias/
+│   └── g1_23dof/
+│       └── config/policy/
+├── source/.../tasks/
+│   ├── locomotion/               # Walking tasks
+│   └── mimic/                    # Dance tasks
+├── scripts/mimic/
+│   ├── csv_to_npz.py            # Convert motion data
+│   └── replay_motion.py         # Preview motion
+└── logs/rsl_rl/                  # Training outputs
+```
+
+---
+
+## System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| OS | Ubuntu 22.04 | Ubuntu 22.04 |
+| GPU | RTX 2070 | RTX 3080+ |
+| VRAM | 8 GB | 16 GB+ |
+| RAM | 32 GB | 64 GB |
+
+---
+
+## Documentation
+
+| File | Description |
+|------|-------------|
+| [CLAUDE.md](./CLAUDE.md) | Full technical documentation |
+| [ROKOKO_PIPELINE.md](./ROKOKO_PIPELINE.md) | Rokoko motion capture |
+| [MOTION_CAPTURE_PIPELINE.md](./MOTION_CAPTURE_PIPELINE.md) | Video to robot motion |
+| [G1_23DOF_GUIDE.md](./G1_23DOF_GUIDE.md) | G1-23dof guide |
+| [SETUP_LOG.md](./SETUP_LOG.md) | Installation log |
+
+---
 
 ## Acknowledgements
 
-This repository is built upon the support and contributions of the following open-source projects. Special thanks to:
-
-- [IsaacLab](https://github.com/isaac-sim/IsaacLab): The foundation for training and running codes.
-- [mujoco](https://github.com/google-deepmind/mujoco.git): Providing powerful simulation functionalities.
-- [robot_lab](https://github.com/fan-ziqi/robot_lab): Referenced for project structure and parts of the implementation.
-- [whole_body_tracking](https://github.com/HybridRobotics/whole_body_tracking): Versatile humanoid control framework for motion tracking.
+- [IsaacLab](https://github.com/isaac-sim/IsaacLab)
+- [unitreerobotics/unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab)
+- [MuJoCo](https://github.com/google-deepmind/mujoco)
+- [robot_lab](https://github.com/fan-ziqi/robot_lab)
+- [whole_body_tracking](https://github.com/HybridRobotics/whole_body_tracking)
