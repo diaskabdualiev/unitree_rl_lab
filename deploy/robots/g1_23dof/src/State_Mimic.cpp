@@ -39,51 +39,29 @@ namespace mdp
 
 REGISTER_OBSERVATION(motion_joint_pos)
 {
-    auto & robot = env->robot;
     auto & loader = State_Mimic::motion;
-    auto & ids = robot->data.joint_ids_map;
-
-    auto data_dfs = loader->joint_pos();
-    Eigen::VectorXf data_bfs = Eigen::VectorXf::Zero(data_dfs.size());
-    for(int i = 0; i < data_dfs.size(); ++i) {
-        data_bfs(i) = data_dfs[ids[i]];
-    }
-    return std::vector<float>(data_bfs.data(), data_bfs.data() + data_bfs.size());
+    // Motion file is already in Isaac Lab order, no remapping needed
+    auto data = loader->joint_pos();
+    return std::vector<float>(data.data(), data.data() + data.size());
 }
 
 REGISTER_OBSERVATION(motion_joint_vel)
 {
-    auto & robot = env->robot;
     auto & loader = State_Mimic::motion;
-    auto & ids = robot->data.joint_ids_map;
-
-    auto data_dfs = loader->joint_vel();
-    Eigen::VectorXf data_bfs = Eigen::VectorXf::Zero(data_dfs.size());
-    for(int i = 0; i < data_dfs.size(); ++i) {
-        data_bfs(i) = data_dfs[ids[i]];
-    }
-    return std::vector<float>(data_bfs.data(), data_bfs.data() + data_bfs.size());
+    // Motion file is already in Isaac Lab order, no remapping needed
+    auto data = loader->joint_vel();
+    return std::vector<float>(data.data(), data.data() + data.size());
 }
 
 REGISTER_OBSERVATION(motion_command)
 {
-    auto & robot = env->robot;
     auto & loader = State_Mimic::motion;
-    auto & ids = robot->data.joint_ids_map;
-
-    auto pos_dfs = loader->joint_pos();
-    Eigen::VectorXf pos_bfs = Eigen::VectorXf::Zero(pos_dfs.size());
-    for(int i = 0; i < pos_dfs.size(); ++i) {
-        pos_bfs(i) = pos_dfs[ids[i]];
-    }
-    auto vel_dfs = loader->joint_vel();
-    Eigen::VectorXf vel_bfs = Eigen::VectorXf::Zero(vel_dfs.size());
-    for(int i = 0; i < vel_dfs.size(); ++i) {
-        vel_bfs(i) = vel_dfs[ids[i]];
-    }
+    // Motion file is already in Isaac Lab order, no remapping needed
+    auto pos = loader->joint_pos();
+    auto vel = loader->joint_vel();
     std::vector<float> data;
-    data.insert(data.end(), pos_bfs.data(), pos_bfs.data() + pos_bfs.size());
-    data.insert(data.end(), vel_bfs.data(), vel_bfs.data() + vel_bfs.size());
+    data.insert(data.end(), pos.data(), pos.data() + pos.size());
+    data.insert(data.end(), vel.data(), vel.data() + vel.size());
     return data;
 }
 
