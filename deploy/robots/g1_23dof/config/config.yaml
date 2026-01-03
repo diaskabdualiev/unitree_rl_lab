@@ -70,6 +70,8 @@ FSM:
     transitions:
       Passive: LT + B.on_pressed
       Mimic_Bata_Dias: LT(2s) + A.on_pressed
+      Mimic_Gangnam_Style: LT(2s) + left.on_pressed
+      Mimic_Dance_102: LT(2s) + down.on_pressed
     policy_dir: config/policy/velocity
   Mimic_Bata_Dias:
     transitions:

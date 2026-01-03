@@ -136,6 +136,8 @@ State_Mimic::State_Mimic(int state_mode, std::string state_string)
 
 void State_Mimic::enter()
 {
+    spdlog::info("[State_Mimic] enter() started");
+
     // set gain
     for (int i = 0; i < env->robot->data.joint_stiffness.size(); ++i)
     {
@@ -148,8 +150,9 @@ void State_Mimic::enter()
     motion = motion_; // set for specific motion
     env->reset();
     // Start policy thread
-    policy_thread_running = true;
+    policy_thread_running.store(true);
     policy_thread = std::thread([this]{
+        spdlog::info("[State_Mimic] policy_thread started");
         using clock = std::chrono::high_resolution_clock;
         const std::chrono::duration<double> desiredDuration(env->step_dt);
         const auto dt = std::chrono::duration_cast<clock::duration>(desiredDuration);
@@ -164,7 +167,7 @@ void State_Mimic::enter()
         motion->reset(env->robot->data, time_range_[0]);
         env->reset();
 
-        while (policy_thread_running)
+        while (policy_thread_running.load())
         {
             env->robot->update();
             motion->update(env->episode_length * env->step_dt + time_range_[0]);
@@ -174,6 +177,7 @@ void State_Mimic::enter()
             std::this_thread::sleep_until(sleepTill);
             sleepTill += dt;
         }
+        spdlog::info("[State_Mimic] policy_thread exiting");
     });
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include "FSM/State_RLBase.h"
 
 class State_Mimic : public FSMState
@@ -10,13 +11,15 @@ public:
     void enter();
 
     void run();
-    
+
     void exit()
     {
-        policy_thread_running = false;
+        spdlog::info("[State_Mimic] exit() called, stopping thread...");
+        policy_thread_running.store(false);
         if (policy_thread.joinable()) {
             policy_thread.join();
         }
+        spdlog::info("[State_Mimic] exit() done, thread joined");
     }
 
     class MotionLoader_;
@@ -27,7 +30,7 @@ private:
     std::shared_ptr<MotionLoader_> motion_; // for saving
 
     std::thread policy_thread;
-    bool policy_thread_running = false;
+    std::atomic<bool> policy_thread_running{false};
     std::array<float, 2> time_range_;
 };
 

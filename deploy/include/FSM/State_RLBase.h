@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <atomic>
 #include "FSMState.h"
 #include "isaaclab/envs/mdp/actions/joint_actions.h"
 #include "isaaclab/envs/mdp/terminations.h"
@@ -14,6 +15,8 @@ public:
     
     void enter()
     {
+        spdlog::info("[State_RLBase] enter() started");
+
         // set gain
         for (int i = 0; i < env->robot->data.joint_stiffness.size(); ++i)
         {
@@ -25,8 +28,9 @@ public:
 
         env->robot->update();
         // Start policy thread
-        policy_thread_running = true;
+        policy_thread_running.store(true);
         policy_thread = std::thread([this]{
+            spdlog::info("[State_RLBase] policy_thread started");
             using clock = std::chrono::high_resolution_clock;
             const std::chrono::duration<double> desiredDuration(env->step_dt);
             const auto dt = std::chrono::duration_cast<clock::duration>(desiredDuration);
@@ -35,7 +39,7 @@ public:
             auto sleepTill = clock::now() + dt;
             env->reset();
 
-            while (policy_thread_running)
+            while (policy_thread_running.load())
             {
                 env->step();
 
@@ -43,24 +47,27 @@ public:
                 std::this_thread::sleep_until(sleepTill);
                 sleepTill += dt;
             }
+            spdlog::info("[State_RLBase] policy_thread exiting");
         });
     }
 
     void run();
-    
+
     void exit()
     {
-        policy_thread_running = false;
+        spdlog::info("[State_RLBase] exit() called, stopping thread...");
+        policy_thread_running.store(false);
         if (policy_thread.joinable()) {
             policy_thread.join();
         }
+        spdlog::info("[State_RLBase] exit() done, thread joined");
     }
 
 private:
     std::unique_ptr<isaaclab::ManagerBasedRLEnv> env;
 
     std::thread policy_thread;
-    bool policy_thread_running = false;
+    std::atomic<bool> policy_thread_running{false};
 };
 
 REGISTER_FSM(State_RLBase)
