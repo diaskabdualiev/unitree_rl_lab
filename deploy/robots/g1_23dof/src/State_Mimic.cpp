@@ -40,7 +40,7 @@ namespace mdp
 REGISTER_OBSERVATION(motion_joint_pos)
 {
     auto & loader = State_Mimic::motion;
-    // Motion file is already in Isaac Lab order, no remapping needed
+    // CSV file MUST be in Isaac Lab joint order (converted by convert_29dof_to_23dof_isaac_order.py)
     auto data = loader->joint_pos();
     return std::vector<float>(data.data(), data.data() + data.size());
 }
@@ -48,7 +48,7 @@ REGISTER_OBSERVATION(motion_joint_pos)
 REGISTER_OBSERVATION(motion_joint_vel)
 {
     auto & loader = State_Mimic::motion;
-    // Motion file is already in Isaac Lab order, no remapping needed
+    // CSV file MUST be in Isaac Lab joint order (converted by convert_29dof_to_23dof_isaac_order.py)
     auto data = loader->joint_vel();
     return std::vector<float>(data.data(), data.data() + data.size());
 }
@@ -56,7 +56,7 @@ REGISTER_OBSERVATION(motion_joint_vel)
 REGISTER_OBSERVATION(motion_command)
 {
     auto & loader = State_Mimic::motion;
-    // Motion file is already in Isaac Lab order, no remapping needed
+    // CSV file MUST be in Isaac Lab joint order (converted by convert_29dof_to_23dof_isaac_order.py)
     auto pos = loader->joint_pos();
     auto vel = loader->joint_vel();
     std::vector<float> data;

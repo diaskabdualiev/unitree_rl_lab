@@ -34,6 +34,15 @@ private:
     std::array<float, 2> time_range_;
 };
 
+/**
+ * Motion loader for G1-23DOF mimic policy deployment.
+ *
+ * IMPORTANT: CSV file MUST be in Isaac Lab joint order (not SDK order)!
+ * Use scripts/mimic/convert_29dof_to_23dof_isaac_order.py to convert.
+ *
+ * CSV format: 30 columns = 7 pose (x,y,z,qx,qy,qz,qw) + 23 joints (Isaac Lab order)
+ * Isaac Lab order uses joint_ids_map: [0,6,12,1,7,15,22,2,8,16,23,3,9,17,24,4,10,18,25,5,11,19,26]
+ */
 class State_Mimic::MotionLoader_
 {
 public:
@@ -41,10 +50,12 @@ public:
     : dt(1.0f / fps)
     {
         auto data = isaaclab::load_csv(motion_file);
-        
+
         num_frames = data.size();
         duration = num_frames * dt;
-        
+
+        // CSV columns 7+ contain joint positions in Isaac Lab order (NOT SDK order!)
+        // No remapping needed here - the CSV should already be in correct order
         for(int i(0); i < num_frames; ++i)
         {
             root_positions.push_back(Eigen::VectorXf::Map(data[i].data(), 3));

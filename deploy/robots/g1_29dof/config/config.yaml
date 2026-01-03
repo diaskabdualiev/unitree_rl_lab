@@ -21,6 +21,17 @@ FSM:
       id: 104
       type: Mimic
 
+    # CSV Replay modes (direct playback without RL policy)
+    Replay_Dance_102:
+      id: 201
+      type: Replay
+    Replay_Gangnam_Style:
+      id: 202
+      type: Replay
+    Replay_Bata_Dias:
+      id: 203
+      type: Replay
+
   Passive:
     transitions:
       FixStand: LT + up.on_pressed
@@ -46,6 +57,10 @@ FSM:
       Mimic_Gangnam_Style: LT + left.on_pressed
       Mimic_My_Dance: LT + right.on_pressed
       Mimic_Bata_Dias: LT + A.on_pressed
+      # Replay modes (RB + D-pad)
+      Replay_Dance_102: RB + down.on_pressed
+      Replay_Gangnam_Style: RB + left.on_pressed
+      Replay_Bata_Dias: RB + A.on_pressed
     kp: [
       100., 100., 100., 150., 40., 40.,
       100., 100., 100., 150., 40., 40.,
@@ -116,4 +131,82 @@ FSM:
     policy_dir: config/policy/mimic/bata_dias/
     time_start: 0.0
     time_end: 12.5
+
+  # ============== CSV Replay States ==============
+  # Direct playback without RL policy - for testing motion files
+  Replay_Dance_102:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/dance_102/params/G1_Take_102.bvh_60hz.csv
+    time_start: 2.8
+    time_end: 24.0
+    loop: false
+    blend_duration: 2.0
+    control_dt: 0.02
+    kp: [
+      100., 100., 100., 150., 40., 40.,
+      100., 100., 100., 150., 40., 40.,
+      200, 200, 200,
+      40, 40, 40, 40, 40, 40, 40,
+      40, 40, 40, 40, 40, 40, 40,
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,
+      3, 3, 3, 4, 2, 2,
+      5, 5, 5,
+      5, 5, 5, 5, 5, 5, 5,
+      5, 5, 5, 5, 5, 5, 5,
+    ]
+  Replay_Gangnam_Style:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/gangnam_style/params/G1_gangnam_style_V01.bvh_60hz.csv
+    time_start: 5.2
+    time_end: 25.5
+    loop: false
+    blend_duration: 2.0
+    control_dt: 0.02
+    kp: [
+      100., 100., 100., 150., 40., 40.,
+      100., 100., 100., 150., 40., 40.,
+      200, 200, 200,
+      40, 40, 40, 40, 40, 40, 40,
+      40, 40, 40, 40, 40, 40, 40,
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,
+      3, 3, 3, 4, 2, 2,
+      5, 5, 5,
+      5, 5, 5, 5, 5, 5, 5,
+      5, 5, 5, 5, 5, 5, 5,
+    ]
+  Replay_Bata_Dias:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/bata_dias/params/bata_dias_full_60hz.csv
+    time_start: 0.0
+    time_end: 12.5
+    loop: false
+    blend_duration: 2.0
+    control_dt: 0.02
+    kp: [
+      100., 100., 100., 150., 40., 40.,
+      100., 100., 100., 150., 40., 40.,
+      200, 200, 200,
+      40, 40, 40, 40, 40, 40, 40,
+      40, 40, 40, 40, 40, 40, 40,
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,
+      3, 3, 3, 4, 2, 2,
+      5, 5, 5,
+      5, 5, 5, 5, 5, 5, 5,
+      5, 5, 5, 5, 5, 5, 5,
+    ]
 

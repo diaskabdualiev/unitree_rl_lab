@@ -3,10 +3,11 @@
 #include "FSM/State_FixStand.h"
 #include "FSM/State_RLBase.h"
 #include "State_Mimic.h"
+#include "State_Replay.h"
 
 std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
 std::shared_ptr<LowState_t> FSMState::lowstate = nullptr;
-std::shared_ptr<Keyboard> FSMState::keyboard = nullptr;
+std::shared_ptr<Keyboard> FSMState::keyboard = std::make_shared<Keyboard>();
 
 void init_fsm_state()
 {
@@ -34,7 +35,7 @@ int main(int argc, char** argv)
     std::cout << "     G1-23dof Controller \n";
 
     // Unitree DDS Config
-    unitree::robot::ChannelFactory::Instance()->Init(1, vm["network"].as<std::string>()); // domain_id=1 for simulation
+    unitree::robot::ChannelFactory::Instance()->Init(0, vm["network"].as<std::string>()); // domain_id=0 for real robot
 
     init_fsm_state();
 

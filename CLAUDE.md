@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **[MOTION_CAPTURE_PIPELINE.md](./MOTION_CAPTURE_PIPELINE.md)** — How to create CSV motion files (Video→SMPL→Robot, Mixamo, LAFAN1, PHC)
 - **[ROKOKO_PIPELINE.md](./ROKOKO_PIPELINE.md)** — Rokoko FBX → CSV pipeline for mimic training
 - **[G1_23DOF_GUIDE.md](./G1_23DOF_GUIDE.md)** — Mimic training for G1-23dof robot (CSV conversion, NPZ creation, training)
+- **[G1_23DOF_DATA_ORDERING.md](./G1_23DOF_DATA_ORDERING.md)** — Проблема порядка данных 29DOF→23DOF: SDK vs Isaac Lab индексация, решение и альтернативы
 - **[XR_TELEOPERATE_GUIDE.md](./XR_TELEOPERATE_GUIDE.md)** — Подробное руководство по запуску xr_teleoperate + unitree_sim_isaaclab
 - **[4D_HUMANS_GUIDE.md](./4D_HUMANS_GUIDE.md)** — 4D-Humans: извлечение 3D поз из видео (Video→SMPL→PKL)
 - **[SETUP_LOG.md](./SETUP_LOG.md)** — Журнал установки unitree_rl_lab

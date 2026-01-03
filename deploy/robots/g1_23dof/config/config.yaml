@@ -17,23 +17,41 @@ FSM:
       id: 106
       type: Mimic
 
+    # CSV Replay modes (direct playback without RL policy)
+    Replay_Bata_Dias:
+      id: 201
+      type: Replay
+    Replay_Gangnam_Style:
+      id: 202
+      type: Replay
+    Replay_Dance_102:
+      id: 203
+      type: Replay
+    Replay_Joint_Test:
+      id: 210
+      type: Replay
+
   Passive:
     transitions:
       FixStand: LT + up.on_pressed
-    # 23 joints: legs(12) + waist(1) + arms(10)
+    # SDK order (27 elements): legs(12) + waist(1) + [13,14 skip] + left_arm(5) + [20,21 skip] + right_arm(5)
     mode: [
-      1,1,1,1,1,1,  # left leg (6)
-      1,1,1,1,1,1,  # right leg (6)
-      1,             # waist_yaw (1)
-      1,1,1,1,1,    # left arm (5): shoulder_pitch/roll/yaw, elbow, wrist_roll
-      1,1,1,1,1,    # right arm (5): shoulder_pitch/roll/yaw, elbow, wrist_roll
+      1,1,1,1,1,1,  # SDK 0-5: left leg
+      1,1,1,1,1,1,  # SDK 6-11: right leg
+      1,             # SDK 12: waist_yaw
+      0, 0,          # SDK 13-14: waist_roll/pitch (not in 23dof)
+      1,1,1,1,1,    # SDK 15-19: left arm
+      0, 0,          # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+      1,1,1,1,1,    # SDK 22-26: right arm
     ]
     kd: [
-      3,3,3,3,3,3,  # left leg
-      3,3,3,3,3,3,  # right leg
-      3,             # waist_yaw
-      3,3,3,3,3,    # left arm
-      3,3,3,3,3,    # right arm
+      3,3,3,3,3,3,  # SDK 0-5: left leg
+      3,3,3,3,3,3,  # SDK 6-11: right leg
+      3,             # SDK 12: waist_yaw
+      0, 0,          # SDK 13-14: waist_roll/pitch (not in 23dof)
+      3,3,3,3,3,    # SDK 15-19: left arm
+      0, 0,          # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+      3,3,3,3,3,    # SDK 22-26: right arm
     ]
   FixStand:
     transitions:
@@ -42,28 +60,40 @@ FSM:
       Mimic_Bata_Dias: LT + A.on_pressed
       Mimic_Gangnam_Style: LT + left.on_pressed
       Mimic_Dance_102: LT + down.on_pressed
+      # Replay modes (RB + D-pad) - direct CSV without RL
+      Replay_Bata_Dias: RB + A.on_pressed
+      Replay_Gangnam_Style: RB + left.on_pressed
+      Replay_Dance_102: RB + down.on_pressed
+      Replay_Joint_Test: RB + up.on_pressed
+    # SDK order (27 elements): legs(12) + waist(1) + [13,14 skip] + left_arm(5) + [20,21 skip] + right_arm(5)
     kp: [
-      100., 100., 100., 150., 40., 40.,  # left leg
-      100., 100., 100., 150., 40., 40.,  # right leg
-      200,                                # waist_yaw
-      40,40,40,40,40,                     # left arm
-      40,40,40,40,40,                     # right arm
+      100., 100., 100., 150., 40., 40.,  # SDK 0-5: left leg
+      100., 100., 100., 150., 40., 40.,  # SDK 6-11: right leg
+      200,                                # SDK 12: waist_yaw
+      0, 0,                               # SDK 13-14: waist_roll/pitch (not in 23dof)
+      40, 40, 40, 40, 40,                 # SDK 15-19: left arm
+      0, 0,                               # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+      40, 40, 40, 40, 40,                 # SDK 22-26: right arm
     ]
     kd: [
-      2,2,2,4,2,2,  # left leg
-      2,2,2,4,2,2,  # right leg
-      5,             # waist_yaw
-      10,10,10,10,10, # left arm
-      10,10,10,10,10, # right arm
+      2, 2, 2, 4, 2, 2,    # SDK 0-5: left leg
+      2, 2, 2, 4, 2, 2,    # SDK 6-11: right leg
+      5,                    # SDK 12: waist_yaw
+      0, 0,                 # SDK 13-14: waist_roll/pitch (not in 23dof)
+      10, 10, 10, 10, 10,   # SDK 15-19: left arm
+      0, 0,                 # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+      10, 10, 10, 10, 10,   # SDK 22-26: right arm
     ]
     ts: [0, 3]
     qs: [
       [],
-      [ -0.1, 0,0,0.3,-0.2,0,              # left leg
-        -0.1, 0,0,0.3,-0.2,0,              # right leg
-        0,                                  # waist_yaw
-        0, 0.25, 0, 0.97, 0,               # left arm (no wrist_pitch/yaw)
-        0, -0.25, 0, 0.97, 0               # right arm (no wrist_pitch/yaw)
+      [ -0.1, 0, 0, 0.3, -0.2, 0,          # SDK 0-5: left leg
+        -0.1, 0, 0, 0.3, -0.2, 0,          # SDK 6-11: right leg
+        0,                                  # SDK 12: waist_yaw
+        0, 0,                               # SDK 13-14: waist_roll/pitch (not in 23dof)
+        0, 0.25, 0, 0.97, 0,               # SDK 15-19: left arm
+        0, 0,                               # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+        0, -0.25, 0, 0.97, 0               # SDK 22-26: right arm
       ]
     ]
   Velocity:
@@ -100,4 +130,128 @@ FSM:
     policy_dir: config/policy/mimic/dance_102
     time_start: 0.0
     time_end: 20.0
+
+  # ============== CSV Replay States ==============
+  # Direct playback without RL policy - for testing motion files
+  # 23 joints: legs(12) + waist(1) + arms(10)
+  Replay_Bata_Dias:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/bata_dias/params/bata_dias_23dof_60hz.csv
+    time_start: 0.0
+    time_end: 12.5
+    loop: false
+    blend_duration: 2.0
+    control_dt: 0.02
+    # SDK order (27 elements): legs(12) + waist(1) + [13,14 skip] + left_arm(5) + [20,21 skip] + right_arm(5)
+    kp: [
+      100., 100., 100., 150., 40., 40.,  # SDK 0-5: left leg
+      100., 100., 100., 150., 40., 40.,  # SDK 6-11: right leg
+      200,                                # SDK 12: waist_yaw
+      0, 0,                               # SDK 13-14: waist_roll/pitch (not in 23dof)
+      40, 40, 40, 40, 40,                 # SDK 15-19: left arm
+      0, 0,                               # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+      40, 40, 40, 40, 40,                 # SDK 22-26: right arm
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,    # SDK 0-5: left leg
+      3, 3, 3, 4, 2, 2,    # SDK 6-11: right leg
+      5,                    # SDK 12: waist_yaw
+      0, 0,                 # SDK 13-14: waist_roll/pitch (not in 23dof)
+      5, 5, 5, 5, 5,        # SDK 15-19: left arm
+      0, 0,                 # SDK 20-21: left wrist_pitch/yaw (not in 23dof)
+      5, 5, 5, 5, 5,        # SDK 22-26: right arm
+    ]
+  Replay_Gangnam_Style:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/gangnam_style/params/gangnam_style_23dof_60hz.csv
+    time_start: 0.0
+    time_end: 25.0
+    loop: false
+    blend_duration: 2.0
+    control_dt: 0.02
+    # SDK order (27 elements)
+    kp: [
+      100., 100., 100., 150., 40., 40.,  # SDK 0-5: left leg
+      100., 100., 100., 150., 40., 40.,  # SDK 6-11: right leg
+      200,                                # SDK 12: waist_yaw
+      0, 0,                               # SDK 13-14: not in 23dof
+      40, 40, 40, 40, 40,                 # SDK 15-19: left arm
+      0, 0,                               # SDK 20-21: not in 23dof
+      40, 40, 40, 40, 40,                 # SDK 22-26: right arm
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,    # SDK 0-5: left leg
+      3, 3, 3, 4, 2, 2,    # SDK 6-11: right leg
+      5,                    # SDK 12: waist_yaw
+      0, 0,                 # SDK 13-14: not in 23dof
+      5, 5, 5, 5, 5,        # SDK 15-19: left arm
+      0, 0,                 # SDK 20-21: not in 23dof
+      5, 5, 5, 5, 5,        # SDK 22-26: right arm
+    ]
+  Replay_Dance_102:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/dance_102/params/dance_102_23dof_60hz.csv
+    time_start: 0.0
+    time_end: 20.0
+    loop: false
+    blend_duration: 2.0
+    control_dt: 0.02
+    # SDK order (27 elements)
+    kp: [
+      100., 100., 100., 150., 40., 40.,  # SDK 0-5: left leg
+      100., 100., 100., 150., 40., 40.,  # SDK 6-11: right leg
+      200,                                # SDK 12: waist_yaw
+      0, 0,                               # SDK 13-14: not in 23dof
+      40, 40, 40, 40, 40,                 # SDK 15-19: left arm
+      0, 0,                               # SDK 20-21: not in 23dof
+      40, 40, 40, 40, 40,                 # SDK 22-26: right arm
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,    # SDK 0-5: left leg
+      3, 3, 3, 4, 2, 2,    # SDK 6-11: right leg
+      5,                    # SDK 12: waist_yaw
+      0, 0,                 # SDK 13-14: not in 23dof
+      5, 5, 5, 5, 5,        # SDK 15-19: left arm
+      0, 0,                 # SDK 20-21: not in 23dof
+      5, 5, 5, 5, 5,        # SDK 22-26: right arm
+    ]
+  Replay_Joint_Test:
+    transitions:
+      Passive: LT + B.on_pressed
+      FixStand: RB + X.on_pressed
+    fps: 60
+    motion_file: /home/akylbek/Документы/unitree_alashed/joint_test_23dof/00_L_LEG_HIP_PITCH.csv
+    time_start: 0.0
+    time_end: 6.0
+    loop: true
+    blend_duration: 1.0
+    control_dt: 0.02
+    # SDK order (27 elements)
+    kp: [
+      100., 100., 100., 150., 40., 40.,  # SDK 0-5: left leg
+      100., 100., 100., 150., 40., 40.,  # SDK 6-11: right leg
+      200,                                # SDK 12: waist_yaw
+      0, 0,                               # SDK 13-14: not in 23dof
+      40, 40, 40, 40, 40,                 # SDK 15-19: left arm
+      0, 0,                               # SDK 20-21: not in 23dof
+      40, 40, 40, 40, 40,                 # SDK 22-26: right arm
+    ]
+    kd: [
+      3, 3, 3, 4, 2, 2,    # SDK 0-5: left leg
+      3, 3, 3, 4, 2, 2,    # SDK 6-11: right leg
+      5,                    # SDK 12: waist_yaw
+      0, 0,                 # SDK 13-14: not in 23dof
+      5, 5, 5, 5, 5,        # SDK 15-19: left arm
+      0, 0,                 # SDK 20-21: not in 23dof
+      5, 5, 5, 5, 5,        # SDK 22-26: right arm
+    ]
 
