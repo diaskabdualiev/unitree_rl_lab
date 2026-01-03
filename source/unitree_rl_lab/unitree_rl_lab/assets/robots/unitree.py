@@ -817,30 +817,35 @@ UNITREE_G1_23DOF_MIMIC_CFG = UnitreeArticulationCfg(
             armature=ARMATURE_4010,
         ),
     },
+    # SDK order with placeholders for non-existent joints (same as UNITREE_G1_23DOF_CFG)
     joint_sdk_names=[
-        "left_hip_pitch_joint",
-        "left_hip_roll_joint",
-        "left_hip_yaw_joint",
-        "left_knee_joint",
-        "left_ankle_pitch_joint",
-        "left_ankle_roll_joint",
-        "right_hip_pitch_joint",
-        "right_hip_roll_joint",
-        "right_hip_yaw_joint",
-        "right_knee_joint",
-        "right_ankle_pitch_joint",
-        "right_ankle_roll_joint",
-        "waist_yaw_joint",
-        "left_shoulder_pitch_joint",
-        "left_shoulder_roll_joint",
-        "left_shoulder_yaw_joint",
-        "left_elbow_joint",
-        "left_wrist_roll_joint",
-        "right_shoulder_pitch_joint",
-        "right_shoulder_roll_joint",
-        "right_shoulder_yaw_joint",
-        "right_elbow_joint",
-        "right_wrist_roll_joint",
+        "left_hip_pitch_joint",       # SDK 0
+        "left_hip_roll_joint",        # SDK 1
+        "left_hip_yaw_joint",         # SDK 2
+        "left_knee_joint",            # SDK 3
+        "left_ankle_pitch_joint",     # SDK 4
+        "left_ankle_roll_joint",      # SDK 5
+        "right_hip_pitch_joint",      # SDK 6
+        "right_hip_roll_joint",       # SDK 7
+        "right_hip_yaw_joint",        # SDK 8
+        "right_knee_joint",           # SDK 9
+        "right_ankle_pitch_joint",    # SDK 10
+        "right_ankle_roll_joint",     # SDK 11
+        "waist_yaw_joint",            # SDK 12
+        "",                           # SDK 13 (waist_roll - not present in 23dof)
+        "",                           # SDK 14 (waist_pitch - not present in 23dof)
+        "left_shoulder_pitch_joint",  # SDK 15
+        "left_shoulder_roll_joint",   # SDK 16
+        "left_shoulder_yaw_joint",    # SDK 17
+        "left_elbow_joint",           # SDK 18
+        "left_wrist_roll_joint",      # SDK 19
+        "",                           # SDK 20 (left_wrist_pitch - not present in 23dof)
+        "",                           # SDK 21 (left_wrist_yaw - not present in 23dof)
+        "right_shoulder_pitch_joint", # SDK 22
+        "right_shoulder_roll_joint",  # SDK 23
+        "right_shoulder_yaw_joint",   # SDK 24
+        "right_elbow_joint",          # SDK 25
+        "right_wrist_roll_joint",     # SDK 26
     ],
 )
 
