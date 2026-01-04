@@ -16,6 +16,9 @@ FSM:
     Mimic_Dance_102:
       id: 106
       type: Mimic
+    Mimic_Dance_102_Smooth:
+      id: 107
+      type: Mimic
 
     # CSV Replay modes (direct playback without RL policy)
     Replay_Bata_Dias:
@@ -60,6 +63,7 @@ FSM:
       Mimic_Bata_Dias: LT + A.on_pressed
       Mimic_Gangnam_Style: LT + left.on_pressed
       Mimic_Dance_102: LT + down.on_pressed
+      Mimic_Dance_102_Smooth: LT + right.on_pressed
       # Replay modes (RB + D-pad) - direct CSV without RL
       Replay_Bata_Dias: RB + A.on_pressed
       Replay_Gangnam_Style: RB + left.on_pressed
@@ -102,6 +106,7 @@ FSM:
       Mimic_Bata_Dias: LT(2s) + A.on_pressed
       Mimic_Gangnam_Style: LT(2s) + left.on_pressed
       Mimic_Dance_102: LT(2s) + down.on_pressed
+      Mimic_Dance_102_Smooth: LT(2s) + right.on_pressed
     policy_dir: config/policy/velocity
   Mimic_Bata_Dias:
     transitions:
@@ -128,6 +133,15 @@ FSM:
     fps: 60
     motion_file: config/policy/mimic/dance_102/params/dance_102_23dof_60hz.csv
     policy_dir: config/policy/mimic/dance_102
+    time_start: 0.0
+    time_end: 20.0
+  Mimic_Dance_102_Smooth:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: config/policy/mimic/dance_102_smooth/params/dance_102_23dof_60hz.csv
+    policy_dir: config/policy/mimic/dance_102_smooth
     time_start: 0.0
     time_end: 20.0
 
