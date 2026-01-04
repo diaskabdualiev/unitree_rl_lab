@@ -80,3 +80,15 @@ def feet_contact_time(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, thresh
     last_contact_time = contact_sensor.data.last_contact_time[:, sensor_cfg.body_ids]
     reward = torch.sum((last_contact_time < threshold) * first_air, dim=-1)
     return reward
+
+
+def base_lin_vel_xy_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """Penalize XY base linear velocity using L2 squared kernel.
+
+    This prevents the robot from walking/stepping around while performing motions.
+    The robot should stay in place and only move its limbs.
+    """
+    from isaaclab.assets import RigidObject
+    asset: RigidObject = env.scene[asset_cfg.name]
+    # Sum of squared XY velocities
+    return torch.sum(torch.square(asset.data.root_lin_vel_b[:, :2]), dim=1)

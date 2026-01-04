@@ -205,12 +205,19 @@ class EventCfg:
         },
     )
 
-    # interval
+    # interval - reduced perturbation for more stable training
     push_robot = EventTerm(
         func=mdp.push_by_setting_velocity,
         mode="interval",
-        interval_range_s=(1.0, 3.0),
-        params={"velocity_range": VELOCITY_RANGE},
+        interval_range_s=(2.0, 5.0),  # Less frequent pushes (was 1-3s, now 2-5s)
+        params={"velocity_range": {
+            "x": (-0.3, 0.3),      # Reduced from (-0.5, 0.5)
+            "y": (-0.3, 0.3),      # Reduced from (-0.5, 0.5)
+            "z": (-0.1, 0.1),      # Reduced from (-0.2, 0.2)
+            "roll": (-0.3, 0.3),   # Reduced from (-0.52, 0.52)
+            "pitch": (-0.3, 0.3),  # Reduced from (-0.52, 0.52)
+            "yaw": (-0.5, 0.5),    # Reduced from (-0.78, 0.78)
+        }},
     )
 
 
@@ -218,51 +225,51 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    # -- base
-    joint_acc = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
-    joint_torque = RewTerm(func=mdp.joint_torques_l2, weight=-1e-5)
-    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1e-1)
+    # -- base (INCREASED for smoother real-world deployment)
+    joint_acc = RewTerm(func=mdp.joint_acc_l2, weight=-1e-6)  # 4x increase: reduces jerky acceleration
+    joint_torque = RewTerm(func=mdp.joint_torques_l2, weight=-2e-5)  # 2x increase: smoother torque
+    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.3)  # 3x increase: much smoother actions
     joint_limit = RewTerm(
         func=mdp.joint_pos_limits,
         weight=-10.0,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*"])},
     )
 
-    # -- tracking
+    # -- tracking (RELAXED std for more stability, less precise but more robust)
     motion_global_anchor_pos = RewTerm(
         func=mdp.motion_global_anchor_position_error_exp,
-        weight=0.5,
-        params={"command_name": "motion", "std": 0.3},
+        weight=1.5,  # 0.5 → 1.5: INCREASED to keep robot near target position
+        params={"command_name": "motion", "std": 0.3},  # Keep tight position tracking
     )
     motion_global_anchor_ori = RewTerm(
         func=mdp.motion_global_anchor_orientation_error_exp,
         weight=0.5,
-        params={"command_name": "motion", "std": 0.4},
+        params={"command_name": "motion", "std": 0.6},  # 0.4 → 0.6: allow more orientation deviation
     )
     motion_body_pos = RewTerm(
         func=mdp.motion_relative_body_position_error_exp,
-        weight=1.0,
-        params={"command_name": "motion", "std": 0.3},
+        weight=0.8,  # 1.0 → 0.8: slightly reduce importance
+        params={"command_name": "motion", "std": 0.5},  # 0.3 → 0.5: more tolerance
     )
     motion_body_ori = RewTerm(
         func=mdp.motion_relative_body_orientation_error_exp,
-        weight=1.0,
-        params={"command_name": "motion", "std": 0.4},
+        weight=0.8,  # 1.0 → 0.8
+        params={"command_name": "motion", "std": 0.6},  # 0.4 → 0.6
     )
     motion_body_lin_vel = RewTerm(
         func=mdp.motion_global_body_linear_velocity_error_exp,
-        weight=1.0,
-        params={"command_name": "motion", "std": 1.0},
+        weight=0.7,  # 1.0 → 0.7: less emphasis on exact velocity
+        params={"command_name": "motion", "std": 1.5},  # 1.0 → 1.5
     )
     motion_body_ang_vel = RewTerm(
         func=mdp.motion_global_body_angular_velocity_error_exp,
-        weight=1.0,
-        params={"command_name": "motion", "std": 3.14},
+        weight=0.7,  # 1.0 → 0.7
+        params={"command_name": "motion", "std": 4.0},  # 3.14 → 4.0
     )
 
     undesired_contacts = RewTerm(
         func=mdp.undesired_contacts,
-        weight=-0.1,
+        weight=-0.3,  # -0.1 → -0.3: 3x penalty for unwanted contacts (better stability)
         params={
             "sensor_cfg": SceneEntityCfg(
                 "contact_forces",
@@ -272,6 +279,12 @@ class RewardsCfg:
             ),
             "threshold": 1.0,
         },
+    )
+
+    # Prevent robot from walking around - penalize XY base velocity
+    base_lin_vel_xy = RewTerm(
+        func=mdp.base_lin_vel_xy_l2,
+        weight=-0.5,  # Strong penalty for horizontal movement
     )
 
 
@@ -327,7 +340,9 @@ class RobotEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self):
         """Post initialization."""
         # general settings
-        self.decimation = 4
+        # Increased from 4 to 6 for slower control frequency (33Hz instead of 50Hz)
+        # This makes movements smoother and reduces oscillation
+        self.decimation = 6
         self.episode_length_s = 30.0
         # simulation settings
         self.sim.dt = 0.005
